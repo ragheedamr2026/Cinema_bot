@@ -23,19 +23,18 @@ else:
 
 # 2. Collect movies
 soup = BeautifulSoup(r.text, "html.parser")
-print("Status:", r.status_code, "| Length:", len(r.text))
-print("Title:", soup.title.string if soup.title else None)
-hrefs = [a["href"] for a in soup.select("a[href]")]
-print("Links:", len(hrefs))
-for h in hrefs[:60]:
-    print("  ", h)
-print("Snippet:", r.text[:800])
-
+SKIP = {"whatson", "comingsoon"}
 movies = {}
-for a in soup.select('a[href*="/movie-details/"]'):
+for a in soup.select('a[href*="/movies/"]'):
     href = urlsplit(a["href"]).path.rstrip("/")
-    name = a.get("title") or a.get_text(strip=True)
-    if name and href not in movies:
+    parts = href.split("/")
+    if len(parts) != 3 or parts[1] != "movies" or parts[2] in SKIP:
+        continue
+    img = a.find("img")
+    name = (a.get("title") or a.get_text(strip=True)
+            or (img.get("alt") if img else "")
+            or parts[2].replace("-", " ").title())
+    if href not in movies or not movies[href]:
         movies[href] = name
 
 print("Found", len(movies), "movie(s)!")
