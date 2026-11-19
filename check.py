@@ -23,6 +23,14 @@ else:
 
 # 2. Collect movies
 soup = BeautifulSoup(r.text, "html.parser")
+print("Status:", r.status_code, "| Length:", len(r.text))
+print("Title:", soup.title.string if soup.title else None)
+hrefs = [a["href"] for a in soup.select("a[href]")]
+print("Links:", len(hrefs))
+for h in hrefs[:60]:
+    print("  ", h)
+print("Snippet:", r.text[:800])
+
 movies = {}
 for a in soup.select('a[href*="/movie-details/"]'):
     href = urlsplit(a["href"]).path.rstrip("/")
