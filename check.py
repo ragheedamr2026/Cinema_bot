@@ -58,7 +58,7 @@ for a in soup.select('a[href*="showtimes"]'):
 
 print("Dates found:", ", ".join(sorted(dates)) or "none")
 for d in sorted(dates):
-    time.sleep(2)  # be gentle with the site
+    time.sleep(5)  # be gentle with the site
     page = fetch(f"https://egy.voxcinemas.com/showtimes?c={CINEMA}&d={d}")
     if page is None:
         sys.exit(f"Could not load date {d}; skipping this run to avoid false alerts.")
