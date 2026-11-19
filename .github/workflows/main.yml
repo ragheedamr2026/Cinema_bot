@@ -5,15 +5,16 @@ on:
   workflow_dispatch:
 permissions:
   contents: write
+concurrency:
+  group: check
+  cancel-in-progress: false
 jobs:
   run:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: pip install requests beautifulsoup4
+      - uses: actions/checkout@v5
       - run: pip install curl_cffi beautifulsoup4
       - run: python check.py
-      
         env:
           TOKEN: ${{ secrets.TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
@@ -21,5 +22,7 @@ jobs:
           git config user.name bot
           git config user.email bot@users.noreply.github.com
           git add seen.json
-          git commit -m update || true
-          git push || true
+          git diff --cached --quiet && exit 0
+          git commit -m "update seen.json"
+          git pull --rebase
+          git push
